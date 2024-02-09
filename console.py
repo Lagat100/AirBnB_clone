@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 """Building a command interpreter"""
 import cmd
-import models
 import shlex
+import models
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
@@ -12,6 +12,8 @@ class HBNBCommand(cmd.Cmd):
     Command interpreter for the HBNB console
     """
     prompt = "(hbnb) "
+
+    classes = {"BaseModel": BaseModel}
 
     def do_quit(self, line):
         """Quit command to exit the program."""
@@ -41,7 +43,7 @@ class HBNBCommand(cmd.Cmd):
         if not line:
             print("** class name missing **")
         else:
-            if line in HBNBCommand.classes:
+            if line in HBNBCommand.classes.keys():
                 new_instance = eval(line)()
                 new_instance.save()
                 print(new_instance.id)
@@ -56,7 +58,7 @@ class HBNBCommand(cmd.Cmd):
         clargs = line.split()
         if len(clargs) == 0:
             print("** class name missing **")
-        elif clargs[0] not in HBNBCommand.classes:
+        elif clargs[0] not in HBNBCommand.classes.keys():
             print("** class doesn't exist **")
         elif len(clargs) == 1:
             print("** instance id missing **")
@@ -75,7 +77,7 @@ class HBNBCommand(cmd.Cmd):
         clargs = line.split()
         if len(clargs) == 0:
             print("** class name missing **")
-        elif clargs[0] not in HBNBCommand.classes:
+        elif clargs[0] not in HBNBCommand.classes.keys():
             print("** class doesn't exist **")
         elif len(clargs) == 1:
             print("** instance id missing **")
@@ -95,7 +97,7 @@ class HBNBCommand(cmd.Cmd):
         clargs = line.split()
         new_list = []
         if len(clargs) == 1:
-            if clargs[0] not in HBNBCommand.classes:
+            if clargs[0] not in HBNBCommand.classes.keys():
                 print("** class doesn't exist **")
             else:
                 for key in models.storage.all().keys():
@@ -121,7 +123,7 @@ class HBNBCommand(cmd.Cmd):
         nova_dict = models.storage.all()
         if len(clargs) == 0:
             print("** class name missing **")
-        elif clargs[0] not in HBNBCommand.classes:
+        elif clargs[0] not in HBNBCommand.classes.keys():
             print("** class doesn't exist **")
         elif len(clargs) == 1:
             print("** instance id missing **")
