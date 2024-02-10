@@ -59,7 +59,7 @@ class HBNBCommand(cmd.Cmd):
     def do_show(self, line):
         """ prints the string representation of an instance
             based on the class name and id
-            Usage: show <class name> <id>
+            Usage: show <class name> <id> or <slass>.show(<id>)
         """
         clargs = line.split()
         if len(clargs) == 0:
@@ -78,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
     def do_destroy(self, line):
         """
         Deletes an instance based on the class name and id
-        Usage: destroy <class name> <id>
+        Usage: destroy <class name> <id> or <class>.destroy(<id>)
         """
         clargs = line.split()
         if len(clargs) == 0:
@@ -98,7 +98,7 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, line):
         """prints string rep of all instances based or not
         based on the class name.
-        Usage: all <class name> or all
+        Usage: all <class name> or all or <class name>.all()
         """
         clargs = line.split()
         new_list = []
@@ -122,7 +122,7 @@ class HBNBCommand(cmd.Cmd):
         """Updates an instance based on the class name an id by
             adding or updating attribute.
             Usage: update <class name> <id> <attribute name>
-            "<attribute value>"
+            "<attribute value>" or <class>.update(<id>, <attribute_name>, <attribute_value) or <class>.update(<id>, <dictionary representation>)
         """
         clargs = shlex.split(line)
         models.storage.reload()
@@ -148,22 +148,6 @@ class HBNBCommand(cmd.Cmd):
             else:
                 setattr(nova_dict[key_id], clargs[2], clargs[3])
                 models.storage.save()
-    
-    def do_count(self, line):
-        """
-            counts the number of instances of a class
-            usage: User.cout()
-        """
-        clargs = line.split()
-        if not clargs:
-            print("***instances missing***")
-            return
-        class_name = clargs[0]
-        if class_name not in globals():
-            print("***class doesn't exist ***")
-            return
-        count = len(globals()[class_name].all())
-        print(count)
 
     def parse(line):
         """Helper method to parse user-typed input."""
