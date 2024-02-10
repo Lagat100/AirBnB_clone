@@ -148,6 +148,22 @@ class HBNBCommand(cmd.Cmd):
             else:
                 setattr(nova_dict[key_id], clargs[2], clargs[3])
                 models.storage.save()
+    
+    def do_count(self, line):
+        """
+            counts the number of instances of a class
+            usage: User.cout()
+        """
+        clargs = line.split()
+        if not clargs:
+            print("***instances missing***")
+            return
+        class_name = clargs[0]
+        if class_name not in globals():
+            print("***class doesn't exist ***")
+            return
+        count = len(globals()[class_name].all())
+        print(count)
 
     def parse(line):
         """Helper method to parse user-typed input."""
