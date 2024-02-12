@@ -1,5 +1,6 @@
 0x00. AirBnB clone - The console
 
+![The AirBnB](https://s3.amazonaws.com/alx-intranet.hbtn.io/uploads/medias/2018/6/65f4a1dd9c51265f49d0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARDDGGGOUSBVO6H7D%2F20240212%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240212T185439Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=a255e39fa5668794dab5f1bb65d9cb5b0eeaca371d45792554defa1c9aa8dd2a)
 
 Welcome to the AirBnB clone project!
 
