@@ -40,40 +40,45 @@ class HBNBCommand(cmd.Cmd):
         """ Do nothing on empty input lines."""
         pass
 
-    def do_create(self, line):
+    def do_create(self, clsname=None):
         """
         creates a new instance of BaseModel, saves it to disk
         and prints the id
         Usage: create <class name>
         """
-        if not line:
+        if not clsname:
             print("** class name missing **")
+        elif not self.classes.get(clsname):
+            print('** class doesn\'t exist **')
         else:
-            if line in HBNBCommand.classes.keys():
-                new_instance = eval(line)()
-                new_instance.save()
-                print(new_instance.id)
-            else:
-                print("** class doesn't exist **")
+            obj = self.classes[clsname]()
+            models.storage.save()
+            print(obj.id)
 
-    def do_show(self, line):
+    def do_show(self, arg):
         """ prints the string representation of an instance
             based on the class name and id
             Usage: show <class name> <id> or <slass>.show(<id>)
         """
-        clargs = line.split()
-        if len(clargs) == 0:
-            print("** class name missing **")
-        elif clargs[0] not in HBNBCommand.classes.keys():
-            print("** class doesn't exist **")
-        elif len(clargs) == 1:
-            print("** instance id missing **")
+        clsname, objid = None, None
+        args = arg.split(' ')
+        if len(args) > 0:
+            clsname = args[0]
+        if len(args) > 1:
+            objid = args[1]
+        if not clsname:
+            print('** class name missing **')
+        elif not objid:
+            print('** instance id missing **')
+        elif not self.classes.get(clsname):
+            print('** class doesn\'t exist **')
         else:
-            key_id = "{}.{}".format(clargs[0], clargs[1])
-            try:
-                print(models.storage.all()[key_id])
-            except KeyError:
-                print("** no instance found **")
+            k = clsname + "." + objid
+            obj = models.storage.all().get(k)
+            if not obj:
+                print('** no instance found **')
+            else:
+                print(obj)
 
     def do_destroy(self, line):
         """
@@ -148,6 +153,80 @@ class HBNBCommand(cmd.Cmd):
             else:
                 setattr(nova_dict[key_id], clargs[2], clargs[3])
                 models.storage.save()
+
+    def default(self, line):
+        """handle class commands """
+        ln = line.split('.', 1)
+        if len(ln) < 2:
+            print('*** Unkown syntax:', ln[0])
+            return False
+        clsname, line = ln[0], ln[1]
+        if clsname not in list(self.classes.keys()):
+            print('** Unkown syntax: {}.{}'.format(clsname, line))
+            return False
+        ln = line.split('(', 1)
+        if len(ln) < 2:
+            print('*** Unkown syntax: {}.{}'.format(clsname, ln[0]))
+            return False
+        mthname, args = ln[0], ln[1].rstrip(')')
+        if mthname not in ['all', 'count', 'show', 'destroy', 'update']:
+            print('*** Unkown syntax: {}.{}'.format(clsname, line))
+            return False
+        if mthname == 'all':
+            self.do_all(clsname)
+        elif mthname == 'count':
+            print(self.count_class(clsname))
+        elif mthname == 'show':
+            self.do_show(clsname + " " + args.strip('"'))
+        elif mthname == 'destroy':
+            self.do_destroy(clsname + " " + args.strip('"'))
+        elif mthname == 'update':
+            lb, rb = args.find('{'), args.find('}')
+            d = None
+            if args[lb:rb + 1] != '':
+                d = eval(args[lb:rb + 1])
+            ln = args.split(',', 1)
+            objid, args = ln[0].strip('"'), ln[1]
+            if d and type(d) is dict:
+                self.handle_dict(clsname, objid, d)
+            else:
+                from shlex import shlex
+                args = args.replace(',', ' ', 1)
+                ln = list(shlex(args))
+                ln[0] = ln[0].strip('"')
+                self.do_update(" ".join([clsname, objid, ln[0], ln[1]]))
+    
+    def handle_dict(self, clsname, objid, d):
+        """handle dictionary update"""
+        for k, v in d.items():
+            self.do_update(" ".join([clsname, objid, str(k), str(v)]))
+
+    def postloop(self):
+        """print new line after each loop"""
+        print()
+
+    @staticmethod
+    def count_class(clsname):
+        """count number of objects of type clsname"""
+        c = 0
+        for k, v in models.storage.all().items():
+            if type(v).__name__ == clsname:
+                c += 1
+        return (c)
+
+    @staticmethod
+    def getType(attrval):
+        """return the type of the input string"""
+        try:
+            int(attrval)
+            return (int)
+        except ValueError:
+            pass
+        try:
+            float(attrval)
+            return (float)
+        except ValueError:
+            return (str)
 
     def parse(line):
         """Helper method to parse user-typed input."""
